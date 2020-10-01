@@ -1,0 +1,170 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+    template: gitea
+message: |-
+  A gitea application has been created in your project: ${APPLICATION_NAME}.
+metadata:
+  annotations:
+    description: |-
+      Deploy a Gitea git service.
+    iconClass: icon-git
+    openshift.io/display-name: Gitea Git Server
+    openshift.io/long-description: This template deploys the Gitea web-based Git service.
+    tags: git
+  name: gitea
+objects:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: ${APPLICATION_NAME}
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${PVC_SIZE}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      app.kubernetes.io/component: ${APPLICATION_NAME}
+      app.kubernetes.io/instance: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        deployment: ${APPLICATION_NAME}
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          deployment: ${APPLICATION_NAME}
+      spec:
+        containers:
+        - env:
+          - name: HOME
+            value: "/data"
+          - name: GITEA_WORK_DIR
+            value: "/data/gitea"
+          - name: GITEA_CUSTOM
+            value: "/data/gitea"
+          - name: DISABLE_REGISTRATION
+            value: "true"
+          - name: DISABLE_SSH
+            value: "true"
+          - name: DOMAIN
+            value: ${DOMAIN}
+          - name: INSTALL_LOCK
+            value: "true"
+          - name: ROOT_URL
+            value: ${ROOT_URL}
+          - name: RUN_MODE
+            value: prod
+          - name: SECRET_KEY
+            value: ${SECRET_KEY}
+          workingDir: /etc/s6/gitea
+          command:
+            - entrypoint
+            - /etc/s6/gitea/run
+          image: ghcr.io/kwkoo/gitea-openshift:1.12.4
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthcheck
+              port: 3000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthcheck
+              port: 3000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gitea
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ${APPLICATION_NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      app.kubernetes.io/component: ${APPLICATION_NAME}
+      app.kubernetes.io/instance: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      deployment: ${APPLICATION_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      app.kubernetes.io/component: ${APPLICATION_NAME}
+      app.kubernetes.io/instance: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    port:
+      targetPort: 3000
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}
+      weight: 100
+    wildcardPolicy: None
+parameters:
+- description: The name for this application.
+  displayName: Application Name
+  name: APPLICATION_NAME
+  value: "gitea"
+  required: true
+- description: The of the Persistent Volume Claim.
+  displayName: PVC Size
+  name: PVC_SIZE
+  value: "10Gi"
+  required: true
+- description: "Domain name of the Gitea server, used for the displayed http clone URL in Gitea’s UI."
+  displayName: Domain
+  name: DOMAIN
+  required: true
+- description: "Overwrite the automatically generated public URL. This is useful if the internal and the external URL don’t match."
+  displayName: Root URL
+  name: ROOT_URL
+- description: "Global secret key."
+  displayName: Secret Key
+  name: SECRET_KEY
