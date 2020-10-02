@@ -87,10 +87,6 @@ objects:
             value: ${LOG_LEVEL}
           - name: DISABLE_ROUTER_LOG
             value: ${DISABLE_ROUTER_LOG}
-          workingDir: /etc/s6/gitea
-          command:
-            - entrypoint
-            - /etc/s6/gitea/run
           image: ghcr.io/kwkoo/gitea-openshift:1.12.4
           imagePullPolicy: IfNotPresent
           livenessProbe:
