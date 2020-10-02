@@ -92,8 +92,7 @@ objects:
             - entrypoint
             - /etc/s6/gitea/run
           image: ghcr.io/kwkoo/gitea-openshift:1.12.4
-          #imagePullPolicy: IfNotPresent
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
             httpGet:
