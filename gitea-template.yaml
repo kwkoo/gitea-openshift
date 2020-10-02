@@ -27,6 +27,8 @@ objects:
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
     labels:
       app: ${APPLICATION_NAME}
       app.kubernetes.io/component: ${APPLICATION_NAME}
@@ -71,12 +73,27 @@ objects:
             value: prod
           - name: SECRET_KEY
             value: ${SECRET_KEY}
+          - name: DB_TYPE
+            value: ${DB_TYPE}
+          - name: DB_HOST
+            value: ${DB_HOST}
+          - name: DB_NAME
+            value: ${DB_NAME}
+          - name: DB_USER
+            value: ${DB_USER}
+          - name: DB_PASSWD
+            value: ${DB_PASSWD}
+          - name: LOG_LEVEL
+            value: ${LOG_LEVEL}
+          - name: DISABLE_ROUTER_LOG
+            value: ${DISABLE_ROUTER_LOG}
           workingDir: /etc/s6/gitea
           command:
             - entrypoint
             - /etc/s6/gitea/run
           image: ghcr.io/kwkoo/gitea-openshift:1.12.4
-          imagePullPolicy: IfNotPresent
+          #imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -168,3 +185,32 @@ parameters:
 - description: "Global secret key."
   displayName: Secret Key
   name: SECRET_KEY
+- description: "The database type in use [mysql, postgres, mssql, sqlite3]."
+  displayName: DB Type
+  name: DB_TYPE
+  value: "sqlite3"
+- description: "Database host address and port."
+  displayName: DB Host
+  name: DB_HOST
+  value: "localhost:3306"
+- description: "Database name."
+  displayName: DB Name
+  name: DB_NAME
+  value: "gitea"
+- description: "Database username."
+  displayName: DB User
+  name: DB_USER
+  value: "root"
+- description: "Database user password. Use `your password` for quoting if you use special characters in the password."
+  displayName: DB Password
+  name: DB_PASSWD
+- description: "Log level [INFO, WARN]."
+  displayName: Log Level
+  name: LOG_LEVEL
+  value: "INFO"
+  required: true
+- description: "Disable router log - set this to true to get rid of router log messages."
+  displayName: Disable Router Log
+  name: DISABLE_ROUTER_LOG
+  value: "false"
+  required: true

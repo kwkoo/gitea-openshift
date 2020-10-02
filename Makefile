@@ -1,6 +1,8 @@
 IMAGE_NAME=gitea-openshift
 VERSION=1.12.4
 
+.PHONY: build push
+
 build:
 	@cd docker && docker build -t $(IMAGE_NAME):$(VERSION) .
 
