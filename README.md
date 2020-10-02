@@ -3,3 +3,47 @@
 An image based off the [official Gitea image on Docker Hub](https://hub.docker.com/r/gitea/gitea).
 
 The `su-exec` call has been removed from `/etc/s6/gitea/run` in order to allow the image to run on OpenShift.
+
+To deploy this on OpenShift with Postgres as the database,
+
+```
+oc new-app \
+  --template=postgresql-persistent \
+  -p POSTGRESQL_USER=gitea \
+  -p POSTGRESQL_PASSWORD=gitea \
+  -p POSTGRESQL_DATABASE=gitea
+
+oc wait \
+  --timeout=120s \
+  --for=condition=available \
+  dc/postgresql
+
+oc new-app \
+  -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-template.yaml \
+  -p DOMAIN=gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
+  -p ROOT_URL=http://gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
+  -p LOG_LEVEL=INFO \
+  -p DISABLE_ROUTER_LOG=true \
+  -p DB_TYPE=postgres \
+  -p DB_HOST=postgresql:5432 \
+  -p DB_NAME=gitea \
+  -p DB_USER=gitea \
+  -p DB_NAME=gitea \
+  -p DB_PASSWD=gitea
+
+oc wait \
+  --timeout=120s \
+  --for=condition=available \
+  deploy/gitea
+
+oc rsh deploy/gitea \
+  gitea \
+  admin \
+  create-user \
+  --admin \
+  --username demo \
+  --password password \
+  --email demo@example.com
+```
+
+If you omit the `DB_*` parameters Gitea will use sqlite3 as the database.
