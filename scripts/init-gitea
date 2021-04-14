@@ -35,7 +35,7 @@ fi
 
 echo "token is $TOKEN"
 
-ROUTE_HOST="$(oc get route/$APP_NAME -o jsonpath='{.spec.host}')"
+ROUTE_HOST="$(oc get route/$APP_NAME -n $PROJ -o jsonpath='{.spec.host}')"
 
 function clone_repo {
   local repoName="$1"
