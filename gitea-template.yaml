@@ -17,6 +17,8 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
   spec:
     accessModes:
@@ -25,7 +27,7 @@ objects:
       requests:
         storage: ${PVC_SIZE}
 - apiVersion: apps/v1
-  kind: Deployment
+  kind: StatefulSet
   metadata:
     annotations:
       template.alpha.openshift.io/wait-for-ready: "true"
@@ -35,42 +37,65 @@ objects:
       app.kubernetes.io/instance: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
   spec:
-    progressDeadlineSeconds: 600
     replicas: 1
-    revisionHistoryLimit: 10
     selector:
       matchLabels:
-        deployment: ${APPLICATION_NAME}
-    strategy:
-      rollingUpdate:
-        maxSurge: 25%
-        maxUnavailable: 25%
-      type: RollingUpdate
+        app: ${APPLICATION_NAME}
+    strategy: {}
     template:
       metadata:
+        creationTimestamp: null
         labels:
-          deployment: ${APPLICATION_NAME}
+          app: ${APPLICATION_NAME}
       spec:
         containers:
-        - env:
+        - image: ghcr.io/kwkoo/gitea-openshift:1.14.0-rootless
+          imagePullPolicy: IfNotPresent
+          name: ${APPLICATION_NAME}
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: ${{HTTP_PORT}}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: ${{HTTP_PORT}}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          ports:
+            - containerPort: ${{HTTP_PORT}}
+              protocol: TCP
+          env:
           - name: HOME
-            value: "/data"
+            value: ${HOME}
           - name: GITEA_WORK_DIR
-            value: "/data/gitea"
+            value: ${GITEA_WORK_DIR}
           - name: GITEA_CUSTOM
-            value: "/data/gitea"
+            value: ${GITEA_CUSTOM}
+          - name: GITEA_APP_INI
+            value: ${GITEA_APP_INI}
           - name: DISABLE_REGISTRATION
-            value: "true"
+            value: ${DISABLE_REGISTRATION}
           - name: DISABLE_SSH
-            value: "true"
+            value: ${DISABLE_SSH}
+          - name: PROTOCOL
+            value: ${PROTOCOL}
           - name: DOMAIN
             value: ${DOMAIN}
           - name: INSTALL_LOCK
-            value: "true"
+            value: ${INSTALL_LOCK}
           - name: ROOT_URL
             value: ${ROOT_URL}
           - name: RUN_MODE
-            value: prod
+            value: "prod"
           - name: SECRET_KEY
             value: ${SECRET_KEY}
           - name: DB_TYPE
@@ -87,45 +112,15 @@ objects:
             value: ${LOG_LEVEL}
           - name: DISABLE_ROUTER_LOG
             value: ${DISABLE_ROUTER_LOG}
-          image: ghcr.io/kwkoo/gitea-openshift:1.12.4
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthcheck
-              port: 3000
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthcheck
-              port: 3000
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          name: gitea
-          ports:
-          - containerPort: 3000
-            protocol: TCP
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
           volumeMounts:
-          - mountPath: /data
-            name: data
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
+          - name: data
+            mountPath: ${GITEA_WORK_DIR}
+          resources: {}
         volumes:
         - name: data
           persistentVolumeClaim:
             claimName: ${APPLICATION_NAME}
+  status: {}
 - apiVersion: v1
   kind: Service
   metadata:
@@ -136,13 +131,15 @@ objects:
     name: ${APPLICATION_NAME}
   spec:
     ports:
-    - port: 3000
+    - name: http
+      port: ${{HTTP_PORT}}
       protocol: TCP
-      targetPort: 3000
+      targetPort: ${{HTTP_PORT}}
     selector:
-      deployment: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}
     sessionAffinity: None
     type: ClusterIP
+  status: {}
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -153,11 +150,14 @@ objects:
     name: ${APPLICATION_NAME}
   spec:
     port:
-      targetPort: 3000
+      targetPort: ${{HTTP_PORT}}
     to:
       kind: Service
       name: ${APPLICATION_NAME}
       weight: 100
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
     wildcardPolicy: None
 parameters:
 - description: The name for this application.
@@ -170,10 +170,46 @@ parameters:
   name: PVC_SIZE
   value: "10Gi"
   required: true
+- description: Home directory of the git user.
+  displayName: Home
+  name: HOME
+  value: "/var/lib/gitea/git"
+- description: Gitea working directory.
+  displayName: Gitea work directory
+  name: GITEA_WORK_DIR
+  value: "/var/lib/gitea"
+- description: Gitea custom directory.
+  displayName: Gitea custom directory
+  name: GITEA_CUSTOM
+  value: "/var/lib/gitea/custom"
+- description: Gitea configuration file
+  displayName: Gitea app.ini
+  name: GITEA_APP_INI
+  value: "/var/lib/gitea/custom/conf/app.ini"
+- description: Disable self-registration screen.
+  displayName: Disable self-registration
+  name: DISABLE_REGISTRATION
+  value: "true"
+- description: Disable SSH.
+  displayName: Disable SSH
+  name: DISABLE_SSH
+  value: "true"
+- description: Web Server protocol.
+  displayName: Protocol
+  name: PROTOCOL
+  value: "http"
+- description: HTTP listen port.
+  displayName: HTTP Port
+  name: HTTP_PORT
+  value: "3000"
 - description: "Domain name of the Gitea server, used for the displayed http clone URL in Gitea’s UI."
   displayName: Domain
   name: DOMAIN
   required: true
+- description: Disallow access to the install page.
+  displayName: Install Lock
+  name: INSTALL_LOCK
+  value: "true"
 - description: "Overwrite the automatically generated public URL. This is useful if the internal and the external URL don’t match."
   displayName: Root URL
   name: ROOT_URL
@@ -202,10 +238,10 @@ parameters:
 - description: "Log level [INFO, WARN]."
   displayName: Log Level
   name: LOG_LEVEL
-  value: "INFO"
+  value: "WARN"
   required: true
 - description: "Disable router log - set this to true to get rid of router log messages."
   displayName: Disable Router Log
   name: DISABLE_ROUTER_LOG
-  value: "false"
+  value: "true"
   required: true

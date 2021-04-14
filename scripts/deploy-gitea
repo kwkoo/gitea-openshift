@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This script creates a Gitea StatefulSet from the template backed by a
+# sqlite3 database stored on the persistent volume attached to the pod.
+
+PROJ="$(oc project -q)"
+APP="gitea"
+
+set -e
+
+# create a dummy route to figure out routing suffix
+oc create route edge dummy --service=dummy --port=8080 -n $PROJ
+SUFFIX="$(oc get route/dummy -n $PROJ -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//')"
+oc delete route/dummy -n $PROJ
+
+oc new-app \
+  -n $PROJ \
+  -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-template.yaml \
+  -p DOMAIN="${APP}-${PROJ}.${SUFFIX}" \
+  -p ROOT_URL="https://${APP}-${PROJ}.${SUFFIX}"
+
+oc rollout status statefulset/${APP} -n $PROJ -w
+
+echo "Gitea is now available at https://$(oc get route/${APP} -n $PROJ -o jsonpath='{.spec.host}')"

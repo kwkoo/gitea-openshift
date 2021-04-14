@@ -1,8 +1,7 @@
 # Gitea OpenShift
 
-An image based off the [official Gitea image on Docker Hub](https://hub.docker.com/r/gitea/gitea).
+An image based off the [official rootless Gitea image on Docker Hub](https://hub.docker.com/r/gitea/gitea).
 
-The `su-exec` call has been removed from `/etc/s6/gitea/run` in order to allow the image to run on OpenShift.
 
 To deploy this on OpenShift with Postgres as the database,
 
@@ -36,10 +35,11 @@ oc wait \
   --for=condition=available \
   deploy/gitea
 
-oc rsh deploy/gitea \
+oc rsh statefulset/gitea \
   gitea \
   admin \
-  create-user \
+  user \
+  create \
   --admin \
   --username demo \
   --password password \
