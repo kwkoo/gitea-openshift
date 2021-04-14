@@ -98,6 +98,8 @@ objects:
             value: "prod"
           - name: SECRET_KEY
             value: ${SECRET_KEY}
+          - name: ENABLE_PUSH_CREATE_USER
+            value: ${ENABLE_PUSH_CREATE_USER}
           - name: DB_TYPE
             value: ${DB_TYPE}
           - name: DB_HOST
@@ -216,6 +218,10 @@ parameters:
 - description: "Global secret key."
   displayName: Secret Key
   name: SECRET_KEY
+- description: Allow users to push local repositories to Gitea and have them automatically created for a user.
+  displayName: Eanble Push Create for Users
+  name: ENABLE_PUSH_CREATE_USER
+  value: "true"
 - description: "The database type in use [mysql, postgres, mssql, sqlite3]."
   displayName: DB Type
   name: DB_TYPE
