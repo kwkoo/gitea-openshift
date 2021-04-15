@@ -20,7 +20,7 @@ oc wait \
 oc new-app \
   -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-template.yaml \
   -p DOMAIN=gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
-  -p ROOT_URL=http://gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
+  -p ROOT_URL=https://gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
   -p LOG_LEVEL=INFO \
   -p DISABLE_ROUTER_LOG=true \
   -p DB_TYPE=postgres \
