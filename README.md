@@ -17,10 +17,15 @@ oc wait \
   --for=condition=available \
   dc/postgresql
 
+# create a dummy route to figure out routing suffix
+oc create route edge dummy --service=dummy --port=8080
+SUFFIX="$(oc get route/dummy -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//')"
+oc delete route/dummy
+
 oc new-app \
   -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-template.yaml \
-  -p DOMAIN=gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
-  -p ROOT_URL=https://gitea-$(oc project -q).$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
+  -p DOMAIN=gitea-$(oc project -q).${SUFFIX} \
+  -p ROOT_URL=https://gitea-$(oc project -q).${SUFFIX} \
   -p LOG_LEVEL=INFO \
   -p DISABLE_ROUTER_LOG=true \
   -p DB_TYPE=postgres \

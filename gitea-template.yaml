@@ -14,18 +14,6 @@ metadata:
     tags: git
   name: gitea
 objects:
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}
-  spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: ${PVC_SIZE}
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
@@ -116,10 +104,15 @@ objects:
           - name: data
             mountPath: ${GITEA_WORK_DIR}
           resources: {}
-        volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: ${APPLICATION_NAME}
+    volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${PVC_SIZE}
   status: {}
 - apiVersion: v1
   kind: Service
