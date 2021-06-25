@@ -1,4 +1,4 @@
-FROM docker.io/gitea/gitea:1.14.0-rootless
+FROM docker.io/gitea/gitea:1.14.3-rootless
 
 LABEL \
   maintainer="Koo Kin Wai <kin.wai.koo@gmail.com>" \

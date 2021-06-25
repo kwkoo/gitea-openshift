@@ -1,5 +1,5 @@
 IMAGE_NAME=gitea-openshift
-VERSION=1.14.0-rootless
+VERSION=1.14.3-rootless
 
 .PHONY: build push
 
