@@ -21,6 +21,7 @@ oc apply -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/root-
 oc new-app \
   -n $PROJ \
   -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-fsgroup-template.yaml \
+  -p IMAGE="ghcr.io/kwkoo/gitea-openshift:1.15.2-rootless" \
   -p PROJECT="$PROJ" \
   -p DOMAIN="${APP}-${PROJ}.${SUFFIX}" \
   -p ROOT_URL="https://${APP}-${PROJ}.${SUFFIX}"
