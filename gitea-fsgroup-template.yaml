@@ -60,7 +60,7 @@ objects:
         securityContext:
           fsGroup: 0
         containers:
-        - image: ghcr.io/kwkoo/gitea-openshift:1.14.3-rootless
+        - image: ${IMAGE}
           imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}
           livenessProbe:
@@ -192,6 +192,10 @@ parameters:
   name: PVC_SIZE
   value: "10Gi"
   required: true
+- description: Gitea container image.
+  displayName: Container Image
+  name: IMAGE
+  value: "ghcr.io/kwkoo/gitea-openshift:1.14.3-rootless"
 - description: Home directory of the git user.
   displayName: Home
   name: HOME

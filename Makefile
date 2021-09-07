@@ -4,7 +4,7 @@ VERSION=1.14.3-rootless
 .PHONY: build push
 
 build:
-	@cd docker && docker build -t ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION) .
+	@cdocker build -t ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION) docker
 
 push:
 	@docker push ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)
