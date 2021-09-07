@@ -6,14 +6,14 @@ cp /tmp/passwd /etc/passwd
 rm -f /tmp/passwd
 
 # Prepare git folder
-mkdir -p ${HOME}
+mkdir -p ${HOME} && chmod 0770 ${HOME}
 if [ ! -w ${HOME} ]; then echo "${HOME} is not writable"; exit 1; fi
 
 # Prepare custom folder
 mkdir -p ${GITEA_CUSTOM}
 
 # Prepare temp folder
-mkdir -p ${GITEA_TEMP}
+mkdir -p ${GITEA_TEMP} && chmod 0770 ${GITEA_TEMP}
 if [ ! -w ${GITEA_TEMP} ]; then echo "${GITEA_TEMP} is not writable"; exit 1; fi
 
 #Prepare config file
@@ -30,7 +30,7 @@ if [ ! -f ${GITEA_APP_INI} ]; then
         INSTALL_LOCK=true
     fi
 
-    # Substitude the environment variables in the template
+    # Substitute the environment variables in the template
     APP_NAME=${APP_NAME:-"Gitea: Git with a cup of tea"} \
     RUN_MODE=${RUN_MODE:-"prod"} \
     RUN_USER=${USER:-"git"} \
