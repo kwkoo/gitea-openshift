@@ -16,7 +16,7 @@ SUFFIX="$(oc get route/dummy -n $PROJ -o jsonpath='{.spec.host}' | sed -e 's/^[^
 oc delete route/dummy -n $PROJ
 
 # add SCC
-oc apply -f 
+oc apply -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/root-fsgroup.yaml
 
 oc new-app \
   -n $PROJ \
