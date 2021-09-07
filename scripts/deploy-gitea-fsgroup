@@ -28,3 +28,8 @@ oc new-app \
 oc rollout status statefulset/${APP} -n $PROJ -w
 
 echo "Gitea is now available at https://$(oc get route/${APP} -n $PROJ -o jsonpath='{.spec.host}')"
+
+# To delete gitea:
+# oc delete all,pvc,sa -l app=$APP -n $PROJ
+# oc adm policy remove-scc-from-user root-fsgroup -z $APP -n $PROJ
+# oc delete scc root-fsgroup
