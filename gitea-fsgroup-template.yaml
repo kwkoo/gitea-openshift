@@ -60,7 +60,7 @@ objects:
         securityContext:
           fsGroup: 0
         containers:
-        - image: ${IMAGE}
+        - image: ${IMAGE}:${TAG}
           imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}
           livenessProbe:
@@ -195,7 +195,11 @@ parameters:
 - description: Gitea container image.
   displayName: Container Image
   name: IMAGE
-  value: "ghcr.io/kwkoo/gitea-openshift:1.14.3-rootless"
+  value: "ghcr.io/kwkoo/gitea-openshift"
+- description: Gitea container image tag.
+  display: Container Image Tag
+  name: TAG
+  value: "latest"
 - description: Home directory of the git user.
   displayName: Home
   name: HOME
