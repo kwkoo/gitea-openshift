@@ -1,5 +1,5 @@
 IMAGE_NAME=gitea-openshift
-VERSION=1.15.2
+VERSION=1.15.4
 
 .PHONY: build push
 
