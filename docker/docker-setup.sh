@@ -1,11 +1,14 @@
 #!/bin/bash
 
+# Identify current id as git
+sed -i "s/git:x:[^:]*:[^:]*:/git:x:$(id -u):$(id -g):/" /etc/passwd
+
 # Prepare git folder
 mkdir -p ${HOME} && chmod 0770 ${HOME}
 if [ ! -w ${HOME} ]; then echo "${HOME} is not writable"; exit 1; fi
 
 # Prepare custom folder
-mkdir -p ${GITEA_CUSTOM} && chmod 0550 ${GITEA_CUSTOM}
+mkdir -p ${GITEA_CUSTOM} && chmod 0770 ${GITEA_CUSTOM}
 
 # Prepare temp folder
 mkdir -p ${GITEA_TEMP} && chmod 0770 ${GITEA_TEMP}
