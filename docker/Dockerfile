@@ -1,4 +1,5 @@
-FROM docker.io/gitea/gitea:%VERSION%-rootless
+ARG VERSION
+FROM docker.io/gitea/gitea:${VERSION}-rootless
 
 LABEL \
   maintainer="Koo Kin Wai <kin.wai.koo@gmail.com>" \

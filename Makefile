@@ -1,12 +1,10 @@
 IMAGE_NAME=gitea-openshift
-VERSION=1.15.4
+VERSION=1.16.5
 
 .PHONY: build push
 
 build:
-	@cat Dockerfile | sed -e 's/%VERSION%/$(VERSION)/' > docker/Dockerfile
-	@docker build -t ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)-rootless docker
-	@rm -f docker/Dockerfile
+	@docker build --build-arg VERSION=$(VERSION) -t ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)-rootless docker
 
 push:
 	@docker push ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)-rootless

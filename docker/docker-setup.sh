@@ -1,16 +1,11 @@
 #!/bin/bash
 
-# Identify current id as git
-cat /etc/passwd | sed -e "s/git:x:[^:]*:[^:]*:/git:x:$(id -u):$(id -g):/" > /tmp/passwd
-cp /tmp/passwd /etc/passwd
-rm -f /tmp/passwd
-
 # Prepare git folder
 mkdir -p ${HOME} && chmod 0770 ${HOME}
 if [ ! -w ${HOME} ]; then echo "${HOME} is not writable"; exit 1; fi
 
 # Prepare custom folder
-mkdir -p ${GITEA_CUSTOM}
+mkdir -p ${GITEA_CUSTOM} && chmod 0550 ${GITEA_CUSTOM}
 
 # Prepare temp folder
 mkdir -p ${GITEA_TEMP} && chmod 0770 ${GITEA_TEMP}
@@ -21,7 +16,7 @@ if [ ! -f ${GITEA_APP_INI} ]; then
 
     #Prepare config file folder
     GITEA_APP_INI_DIR=$(dirname ${GITEA_APP_INI})
-    mkdir -p ${GITEA_APP_INI_DIR}
+    mkdir -p ${GITEA_APP_INI_DIR} && chmod 0770 ${GITEA_APP_INI_DIR}
     if [ ! -w ${GITEA_APP_INI_DIR} ]; then echo "${GITEA_APP_INI_DIR} is not writable"; exit 1; fi
 
     # Set INSTALL_LOCK to true only if SECRET_KEY is not empty and
