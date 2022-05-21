@@ -1,12 +1,17 @@
-IMAGE_NAME=gitea-openshift
-VERSION=1.16.7
+IMAGE_NAME=ghcr.io/kwkoo/gitea-openshift
+VERSION=1.16.8
+BUILDER_NAME=gitea-builder
+BASE:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-.PHONY: build push
+.PHONY: image
 
-build:
-	@docker build --build-arg VERSION=$(VERSION) -t ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)-rootless docker
-
-push:
-	@docker push ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)-rootless
-	@docker tag ghcr.io/kwkoo/$(IMAGE_NAME):$(VERSION)-rootless ghcr.io/kwkoo/$(IMAGE_NAME):latest
-	@docker push ghcr.io/kwkoo/$(IMAGE_NAME):latest
+image:
+	docker buildx use $(BUILDER_NAME) || docker buildx create --name $(BUILDER_NAME) --use
+	docker buildx build \
+	  --push \
+	  --platform=linux/amd64,linux/arm64/v8 \
+	  --rm \
+	  --build-arg VERSION=$(VERSION) \
+	  -t $(IMAGE_NAME):$(VERSION)-rootless \
+	  -t $(IMAGE_NAME):latest \
+	  $(BASE)
