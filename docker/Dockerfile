@@ -1,5 +1,5 @@
 ARG VERSION
-FROM --platform=$BUILDPLATFORM docker.io/gitea/gitea:${VERSION}-rootless
+FROM docker.io/gitea/gitea:${VERSION}-rootless
 
 LABEL \
   maintainer="Koo Kin Wai <kin.wai.koo@gmail.com>" \
