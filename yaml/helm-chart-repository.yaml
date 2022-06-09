@@ -1,0 +1,10 @@
+# Add the helm repo to the OpenShift Console
+#
+apiVersion: helm.openshift.io/v1beta1
+kind: HelmChartRepository
+metadata:
+  name: gitea-repo
+spec:
+  name: gitea-repo
+  connectionConfig:
+    url: https://kwkoo.github.io/gitea-openshift/helm

@@ -16,11 +16,11 @@ SUFFIX="$(oc get route/dummy -n $PROJ -o jsonpath='{.spec.host}' | sed -e 's/^[^
 oc delete route/dummy -n $PROJ
 
 # add SCC
-oc apply -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/root-fsgroup.yaml
+oc apply -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/yaml/root-fsgroup.yaml
 
 oc new-app \
   -n $PROJ \
-  -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-fsgroup-template.yaml \
+  -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/yaml/gitea-fsgroup-template.yaml \
   -p PROJECT="$PROJ" \
   -p DOMAIN="${APP}-${PROJ}.${SUFFIX}" \
   -p ROOT_URL="https://${APP}-${PROJ}.${SUFFIX}"

@@ -7,7 +7,7 @@ GITEA_NAMESPACE=demo
 GITEA_DOMAIN=gitea.apps.kube.home
 GITEA_ROOTURL=http://$(GITEA_DOMAIN)
 
-.PHONY: image
+.PHONY: image helm helm-install-k8s helm-uninstall
 
 image:
 	docker buildx use $(BUILDER_NAME) || docker buildx create --name $(BUILDER_NAME) --use
@@ -26,6 +26,10 @@ image:
 # index.yaml was created by running:
 # helm repo index .
 #
+helm:
+	cd $(BASE)/helm && helm package gitea-openshift
+	cd $(BASE)/helm && helm repo index .
+
 helm-install-k8s:
 	helm upgrade \
 	  --install gitea gitea-openshift \
