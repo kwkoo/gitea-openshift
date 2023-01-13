@@ -63,7 +63,7 @@ objects:
         - image: ${IMAGE}:${TAG}
           imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}
-          securityContent:
+          securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
