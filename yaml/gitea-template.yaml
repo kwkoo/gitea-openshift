@@ -40,6 +40,14 @@ objects:
         - image: ${IMAGE}:${TAG}
           imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}
+          securityContent:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           livenessProbe:
             failureThreshold: 3
             httpGet:
