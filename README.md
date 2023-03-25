@@ -23,7 +23,7 @@ SUFFIX="$(oc get route/dummy -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//')
 oc delete route/dummy
 
 oc new-app \
-  -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/gitea-template.yaml \
+  -f https://raw.githubusercontent.com/kwkoo/gitea-openshift/master/yaml/gitea-template.yaml \
   -p DOMAIN=gitea-$(oc project -q).${SUFFIX} \
   -p ROOT_URL=https://gitea-$(oc project -q).${SUFFIX} \
   -p LOG_LEVEL=WARN \
