@@ -34,7 +34,7 @@ jobs:
         id: get_version
         run: |
           VERSION="$(grep '^VERSION=' Makefile | sed -e 's/VERSION=//')"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" | tee -a $GITHUB_OUTPUT
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
