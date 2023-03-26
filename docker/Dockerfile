@@ -7,7 +7,7 @@ LABEL \
 
 USER root
 
-COPY docker-setup.sh /usr/local/bin/docker-setup.sh
+COPY openshift-entrypoint.sh /usr/local/bin/
 
 RUN \
   chown :0 /etc \
@@ -17,5 +17,9 @@ RUN \
   chown :0 /etc/passwd \
   && \
   chmod g+w /etc/passwd
+
+ENTRYPOINT ["/usr/local/bin/openshift-entrypoint.sh"]
+
+CMD ["/usr/bin/dumb-init", "--", "/usr/local/bin/docker-entrypoint.sh"]
 
 USER 1001

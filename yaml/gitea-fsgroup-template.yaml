@@ -74,7 +74,7 @@ objects:
           livenessProbe:
             failureThreshold: 3
             httpGet:
-              path: /
+              path: /api/healthz
               port: ${{HTTP_PORT}}
               scheme: HTTP
             periodSeconds: 10
@@ -83,7 +83,7 @@ objects:
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /
+              path: /api/healthz
               port: ${{HTTP_PORT}}
               scheme: HTTP
             periodSeconds: 10
@@ -127,9 +127,9 @@ objects:
             value: ${DB_USER}
           - name: DB_PASSWD
             value: ${DB_PASSWD}
-          - name: LOG_LEVEL
+          - name: GITEA__LOG__LEVEL
             value: ${LOG_LEVEL}
-          - name: DISABLE_ROUTER_LOG
+          - name: GITEA__LOG__DISABLE_ROUTER_LOG
             value: ${DISABLE_ROUTER_LOG}
           volumeMounts:
           - name: data
@@ -273,7 +273,7 @@ parameters:
 - description: "Database user password. Use `your password` for quoting if you use special characters in the password."
   displayName: DB Password
   name: DB_PASSWD
-- description: "Log level [INFO, WARN]."
+- description: "Log level [TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, FATAL, NONE]."
   displayName: Log Level
   name: LOG_LEVEL
   value: "WARN"

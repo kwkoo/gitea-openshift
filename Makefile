@@ -1,6 +1,6 @@
 IMAGE_NAME=ghcr.io/kwkoo/gitea-openshift
-VERSION=1.18.0
-BUILDER_NAME=gitea-builder
+VERSION=1.18.5
+BUILDER_NAME=multiarch-builder
 BASE:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 GITEA_NAMESPACE=demo
@@ -18,7 +18,7 @@ image:
 	  --build-arg VERSION=$(VERSION) \
 	  -t $(IMAGE_NAME):$(VERSION)-rootless \
 	  -t $(IMAGE_NAME):latest \
-	  $(BASE)
+	  $(BASE)/docker
 
 # The helm chart is stored in /helm. It was packaged with the following:
 # helm package .
