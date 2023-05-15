@@ -22,4 +22,4 @@ ENTRYPOINT ["/usr/local/bin/openshift-entrypoint.sh"]
 
 CMD ["/usr/bin/dumb-init", "--", "/usr/local/bin/docker-entrypoint.sh"]
 
-USER 1001
+USER 1000
