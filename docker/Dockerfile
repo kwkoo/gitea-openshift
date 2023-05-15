@@ -12,7 +12,7 @@ COPY openshift-entrypoint.sh /usr/local/bin/
 RUN \
   chown :0 /etc \
   && \
-  chmod g+wx /etc \
+  chmod g+wx /etc /var/lib/gitea \
   && \
   chown :0 /etc/passwd \
   && \
