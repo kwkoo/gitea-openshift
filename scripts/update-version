@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# This script updates all the version number in all artifacts.
+#
+# Invoke this script with the new version number without the "-rootless"
+# suffix.
+#
+# This script will also update the Helm chart with the new version and
+# regenerate the index.yaml file.
+
+cd `dirname $0`
+BASE=`pwd`/..
+cd - >> /dev/null
+
+new_version="$1"
+
+if [ -z "$new_version" ]; then
+  echo "Usage: $0 x.y.z"
+  exit 1
+fi
+
+set -e
+
+tmpfile=$(mktemp)
+sed "s/^VERSION=.*/VERSION=$new_version/" $BASE/Makefile > $tmpfile
+mv $tmpfile $BASE/Makefile
+
+tmpdir=$(mktemp --directory)
+tar -C $tmpdir -zxf $BASE/helm/gitea-openshift-*.tgz
+
+tmpfile=$(mktemp)
+sed "s/^appVersion: .*/appVersion: ${new_version}-rootless/" $tmpdir/gitea-openshift/Chart.yaml > $tmpfile
+mv $tmpfile $tmpdir/gitea-openshift/Chart.yaml
+
+cd $tmpdir
+helm package gitea-openshift
+mv $tmpdir/gitea-openshift-*.tgz $BASE/helm/gitea-openshift-*.tgz
+
+cd $BASE/helm
+helm repo index .
+
+rm -rf $tmpdir
