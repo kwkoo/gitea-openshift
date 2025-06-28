@@ -36,8 +36,8 @@ oc new-app \
 
 oc wait \
   --timeout=120s \
-  --for=condition=available \
-  statefulset/gitea
+  --for=condition=ready \
+  po/gitea-0
 
 oc rsh statefulset/gitea \
   gitea \
