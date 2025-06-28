@@ -27,7 +27,6 @@ oc new-app \
   -p DOMAIN=gitea-$(oc project -q).${SUFFIX} \
   -p ROOT_URL=https://gitea-$(oc project -q).${SUFFIX} \
   -p LOG_LEVEL=WARN \
-  -p DISABLE_ROUTER_LOG=true \
   -p DB_TYPE=postgres \
   -p DB_HOST=postgresql:5432 \
   -p DB_NAME=gitea \

@@ -129,8 +129,6 @@ objects:
             value: ${DB_PASSWD}
           - name: GITEA__LOG__LEVEL
             value: ${LOG_LEVEL}
-          - name: GITEA__LOG__DISABLE_ROUTER_LOG
-            value: ${DISABLE_ROUTER_LOG}
           volumeMounts:
           - name: data
             mountPath: ${GITEA_WORK_DIR}
@@ -277,9 +275,4 @@ parameters:
   displayName: Log Level
   name: LOG_LEVEL
   value: "WARN"
-  required: true
-- description: "Disable router log - set this to true to get rid of router log messages."
-  displayName: Disable Router Log
-  name: DISABLE_ROUTER_LOG
-  value: "true"
   required: true
