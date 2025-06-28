@@ -1,5 +1,5 @@
 IMAGE_NAME=ghcr.io/kwkoo/gitea-openshift
-VERSION=1.22.3
+VERSION=1.24.2
 BUILDER_NAME=multiarch-builder
 BASE:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 

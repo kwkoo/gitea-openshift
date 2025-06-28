@@ -2,13 +2,13 @@ apiVersion: v1
 entries:
   gitea-openshift:
   - apiVersion: v2
-    appVersion: 1.18.5-rootless
-    created: "2023-03-26T17:57:36.670797+08:00"
+    appVersion: 1.24.2-rootless
+    created: "2025-06-28T14:28:41.266787+08:00"
     description: Rootless gitea
-    digest: 1a522379663e1b08abc013eb5b803c387b2a9e0fed3bf89556b9beb3d0f02234
+    digest: 7b5f88298961552ea93784487d9be7e1e98536ba0edd8c691ef1c687f3483348
     name: gitea-openshift
     type: application
     urls:
     - gitea-openshift-0.1.0.tgz
     version: 0.1.0
-generated: "2023-03-26T17:57:36.669488+08:00"
+generated: "2025-06-28T14:28:41.26628+08:00"
